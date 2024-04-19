@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option java_package = "fi.leif.voicecommands";
+option java_multiple_files = true;
+
+message Settings {
+  string extra_language = 1;
+  float maxRms = 2;
+  float recMaxRms = 3;
+  repeated Command commands = 4;
+  Command default_command = 5;
+}
+
+message Command {
+  repeated string words = 1;
+  Action action = 2;
+  map<string, string> parameters = 3;
+}
+
+enum Action {
+    GOOGLE_MAPS = 0;
+    WAZE = 1;
+    PHONE_CALL = 2;
+    TELEGRAM = 3;
+    WHATSAPP = 4;
+    SPOTIFY = 5;
+    NETFLIX = 6;
+    OPEN_APP = 7;
+}
+
+enum ParameterKeys {
+  APP_NAME = 0;
+  APP_PACKAGE = 1;
+  DESTINATION = 2;
+  CONTACT_NAME = 3;
+  CONTACT_PHONE = 4;
+  CONTACT_ID = 5;
+  RTC_TYPE = 6;
+  SEARCH_VALUE = 7;
+}
+
+enum RtcType {
+  MESSAGE = 0;
+  AUDIO_CALL = 1;
+  VIDEO_CALL = 2;
+}
