@@ -11,6 +11,7 @@ interface SpeechToTextListener {
     fun onResult(text: String)
     fun onPartialResult(text: String)
     fun onRmsChanged(rmsDb: Float)
+    fun onError()
 }
 
 class SpeechToText(val listener: SpeechToTextListener) {
@@ -60,7 +61,9 @@ class SpeechToText(val listener: SpeechToTextListener) {
             override fun onBeginningOfSpeech() {}
             override fun onBufferReceived(p0: ByteArray?) {}
             override fun onEndOfSpeech() {}
-            override fun onError(p0: Int) {}
+            override fun onError(p0: Int) {
+                listener.onError()
+            }
             override fun onEvent(p0: Int, p1: Bundle?) {}
         })
 

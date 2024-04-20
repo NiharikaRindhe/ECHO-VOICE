@@ -37,13 +37,12 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
     init {
         CoroutineScope(Dispatchers.Main).launch  {
             settingsRepository.getSettings().collect { settings ->
+                soundMeter.maxLevel = settings.maxRms
+                recMaxRms = settings.recMaxRms
                 if(firstLoad) {
                     startListening(settings)
                     firstLoad = false
                 }
-                soundMeter.maxLevel = settings.maxRms
-                recMaxRms = settings.recMaxRms
-
             }
         }
     }
@@ -109,5 +108,9 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
             lifecycleScope.launch { settingsRepository.setRecMaxRms(rmsDb) }
         }
         soundMeter.level = rmsDb
+    }
+
+    override fun onError() {
+        quit()
     }
 }
