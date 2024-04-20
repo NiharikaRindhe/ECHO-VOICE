@@ -15,8 +15,14 @@ interface SpeechToTextListener {
 
 class SpeechToText(val listener: SpeechToTextListener) {
 
+    var sp: SpeechRecognizer? = null
+
+    fun stop() {
+        sp?.cancel()
+    }
+
     fun start(context: Context, extraLang: String) {
-        val sp = SpeechRecognizer.createSpeechRecognizer(context)
+        sp = SpeechRecognizer.createSpeechRecognizer(context)
 
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognizerIntent.putExtra(
@@ -30,7 +36,7 @@ class SpeechToText(val listener: SpeechToTextListener) {
             extraLang
         )
 
-        sp.setRecognitionListener(object : RecognitionListener {
+        sp?.setRecognitionListener(object : RecognitionListener {
             override fun onResults(bundle: Bundle?) {
                 val data = bundle?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if(!data.isNullOrEmpty()) {
@@ -58,6 +64,6 @@ class SpeechToText(val listener: SpeechToTextListener) {
             override fun onEvent(p0: Int, p1: Bundle?) {}
         })
 
-        sp.startListening(speechRecognizerIntent);
+        sp?.startListening(speechRecognizerIntent);
     }
 }

@@ -11,7 +11,6 @@ import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import android.widget.TextView
 import fi.leif.android.voicecommands.R
@@ -138,6 +137,7 @@ class TextMatchVisualizer @JvmOverloads constructor(
 
     private class TextXY(val x: Float, val y: Float, val text: String)
 
+    private val animatorSet = AnimatorSet()
     private fun animate(textView: TextView) {
         val alphaAnimator = ObjectAnimator.ofFloat(
             textView,
@@ -161,9 +161,12 @@ class TextMatchVisualizer @JvmOverloads constructor(
         )
 
         // Create animator set to run both animations together
-        val animatorSet = AnimatorSet()
         animatorSet.playTogether(alphaAnimator, scaleAnimatorX, scaleAnimatorY)
         animatorSet.duration = ANIM_DURATION_MS
         animatorSet.start()
+    }
+
+    fun stop() {
+        animatorSet.cancel()
     }
 }

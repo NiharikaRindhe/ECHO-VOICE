@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
     // TODO: Dependency inject
     private val settingsRepository = SettingsRepository(this)
     private val commandLauncher = CommandLauncher(this)
+    private var stt: SpeechToText = SpeechToText(this)
 
     private var recMaxRms = 0f
     private var firstLoad = true
@@ -51,7 +52,6 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
     private lateinit var soundMeter: SoundLevelVisualizer
 
     private fun startListening(settings: Settings) {
-        val stt = SpeechToText(this)
         stt.start(this, settings.extraLanguage)
     }
 
@@ -62,9 +62,12 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
         // Visualizers
         textMatcher = findViewById(R.id.text_matcher)
         soundMeter = findViewById(R.id.soundLevel)
-        // Back button
+        // Settings button
         val setIcon: ImageView = findViewById(R.id.settings)
         setIcon.setOnClickListener {
+            stt.stop()
+            soundMeter.stop()
+            textMatcher.stop()
             startActivity(Intent(this, SettingsActivity::class.java))
         }
         // Quit if layout clicked
@@ -76,6 +79,9 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
     }
 
     private fun quit() {
+        stt.stop()
+        soundMeter.stop()
+        textMatcher.stop()
         finishAffinity()
     }
 

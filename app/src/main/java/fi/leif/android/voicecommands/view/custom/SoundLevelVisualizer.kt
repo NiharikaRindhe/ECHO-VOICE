@@ -83,6 +83,10 @@ class SoundLevelVisualizer(context: Context, attrs: AttributeSet?) : View(contex
         }
     }
 
+    fun stop() {
+        animator.cancel()
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         animator.start()

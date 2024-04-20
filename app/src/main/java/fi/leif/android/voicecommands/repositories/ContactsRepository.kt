@@ -45,7 +45,7 @@ class ContactsRepository (private val context: Context) {
             arrayOf(mimeType),
             ContactsContract.Data.DISPLAY_NAME + " ASC")
         (cursor != null && cursor.count > 0).let {
-            while (cursor?.moveToNext() == true) { 
+            while (cursor?.moveToNext() == true) {
                 try {
                     val name = cursor.getString(0)
                     val phone = cursor.getString(1).replace(" ", "")
