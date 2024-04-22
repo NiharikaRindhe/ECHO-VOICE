@@ -46,7 +46,7 @@ class EditCommandActivity : AppCompatActivity() {
         viewModel.setMode(editMode, commandIndex)
 
         initCommandWordInput()
-        initInfoText()
+        initTexts()
         initCommandWordChips()
         initActions(commandIndex)
         initTitle()
@@ -76,12 +76,15 @@ class EditCommandActivity : AppCompatActivity() {
         }
     }
 
-    private fun initInfoText() {
+    private fun initTexts() {
         val info: TextView = findViewById(R.id.info)
+        val keywordsTitle: TextView = findViewById(R.id.keywords_title)
         if((editMode == DEFAULT_COMMAND)) {
             info.visibility = View.VISIBLE
+            keywordsTitle.visibility = View.GONE
         } else {
             info.visibility = View.GONE
+            keywordsTitle.visibility = View.VISIBLE
         }
     }
 
@@ -99,6 +102,7 @@ class EditCommandActivity : AppCompatActivity() {
                 val chip = Chip(this)
                 chip.isCloseIconVisible = true
                 chip.text = word
+                chip.textSize = 20f
                 chip.setOnCloseIconClickListener {
                     val c = it as Chip
                     viewModel.removeCommandWord(c.text.toString())
@@ -138,8 +142,8 @@ class EditCommandActivity : AppCompatActivity() {
     }
 
     private fun initBackButton() {
-        val backBtn: Button = findViewById(R.id.back)
-        backBtn.setOnClickListener { goBack() }
+        val topBar: MaterialToolbar = findViewById(R.id.top_bar)
+        topBar.setOnClickListener { goBack() }
     }
 
     private fun goBack() {

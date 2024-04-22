@@ -44,6 +44,11 @@ class ActionViewModel(application: Application) : AndroidViewModel(application) 
 
     private var _noRtcContacts = MutableLiveData(false)
     val noRtcContacts = _noRtcContacts
+    private fun handleNoRtcContacts() {
+        this._selectedRtcType.value = RtcType.MESSAGE
+        fetchPhoneContacts()
+        _noRtcContacts.value = true
+    }
 
     private var _whatsAppContacts = MutableLiveData<List<Contact>>()
     fun fetchWhatsAppContacts() {
@@ -55,7 +60,7 @@ class ActionViewModel(application: Application) : AndroidViewModel(application) 
                     _whatsAppContacts.value = contactsRepository.getWhatsAppVoipContacts()
                     _contacts.value = _whatsAppContacts.value
                 } else {
-                    _noRtcContacts.value = true
+                    handleNoRtcContacts()
                 }
             }
         } else {
@@ -73,7 +78,7 @@ class ActionViewModel(application: Application) : AndroidViewModel(application) 
                     _telegramContacts.value = contactsRepository.getTelegramCallContacts()
                     _contacts.value = _telegramContacts.value
                 } else {
-                    _noRtcContacts.value = true
+                    handleNoRtcContacts()
                 }
             }
         } else {

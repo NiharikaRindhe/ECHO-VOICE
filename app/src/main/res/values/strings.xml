@@ -11,7 +11,8 @@
     <string name="add_command">New Command</string>
     <string name="update_command">Update Command</string>
     <string name="edit_default_command">Edit Default Command</string>
-    <string name="command_input">Add voice keyword(s) <font color='#FF0000'>*</font></string>
+    <string name="keywords">Keyword(s)</string>
+    <string name="command_input">Add Keyword <font color='#FF0000'>*</font></string>
     <string name="action">Select Action <font color='#FF0000'>*</font></string>
     <string name="save">Save</string>
     <string name="back">Back</string>

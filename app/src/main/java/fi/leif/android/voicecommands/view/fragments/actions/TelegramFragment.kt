@@ -1,6 +1,5 @@
 package fi.leif.android.voicecommands.view.fragments.actions
 
-import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
 import fi.leif.voicecommands.RtcType

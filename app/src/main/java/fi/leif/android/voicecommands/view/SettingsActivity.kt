@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -81,8 +82,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Back button
-        val backBtn: MaterialButton = findViewById(R.id.back)
-        backBtn.setOnClickListener {
+        val topBar: MaterialToolbar = findViewById(R.id.top_bar)
+        topBar.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
         }
     }

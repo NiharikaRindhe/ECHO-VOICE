@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.MaterialToolbar
 import fi.leif.android.voicecommands.R
 import fi.leif.android.voicecommands.view.adapters.CommandsListAdapter
 import fi.leif.android.voicecommands.view.adapters.CommandsListListener
@@ -49,12 +50,10 @@ class ListCommandsActivity : AppCompatActivity(), CommandsListListener {
         }
 
         // Back button
-        val backBtn: Button = findViewById(R.id.back)
-        backBtn.setOnClickListener{
+        val topBar: MaterialToolbar = findViewById(R.id.top_bar)
+        topBar.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
-
-
     }
 
     override fun updateCommand(position: Int) {

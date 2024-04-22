@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
 

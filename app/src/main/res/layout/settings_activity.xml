@@ -18,7 +18,7 @@
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
             app:layout_constraintBottom_toTopOf="@id/content"
             app:title="@string/settings" />
 
@@ -88,7 +88,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:text="@string/edit_commands"
-                    android:width="250dp"
+                    android:width="300dp"
                     android:layout_marginTop="50dp"
                     android:layout_marginEnd="10dp"
                     app:icon="@android:drawable/ic_menu_edit" />
@@ -99,36 +99,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:text="@string/default_command"
-                    android:width="250dp"
+                    android:width="300dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginTop="10dp"
                     app:icon="@android:drawable/ic_menu_edit" />
 
             </LinearLayout>
         </ScrollView>
-
-        <!-- bottom bar -->
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/bottom_bar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:layout_constraintTop_toBottomOf="@id/content">
-
-            <com.google.android.material.bottomappbar.BottomAppBar
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/colorPrimary">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/exit"
-                    app:icon="@android:drawable/ic_menu_revert" />
-
-            </com.google.android.material.bottomappbar.BottomAppBar>
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

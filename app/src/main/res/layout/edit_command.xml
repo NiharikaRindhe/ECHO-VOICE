@@ -12,7 +12,7 @@
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
             app:layout_constraintBottom_toTopOf="@id/content"/>
 
         <!-- Content -->
@@ -30,11 +30,26 @@
                 android:orientation="vertical">
 
                 <!-- Existing commands -->
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/command_words"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:animateLayoutChanges="true" />
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/keywords_title"
+                        android:layout_width="wrap_content"
+                        android:text="@string/keywords"
+                        android:gravity="center"
+                        android:paddingLeft="15dp"
+                        android:paddingEnd="15dp"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_height="match_parent"/>
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/command_words"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true" />
+                </LinearLayout>
 
                 <!-- Command input -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -97,14 +112,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/colorPrimary">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/back"
-                    app:icon="@android:drawable/ic_menu_revert" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/save"

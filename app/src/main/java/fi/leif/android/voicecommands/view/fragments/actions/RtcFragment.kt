@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import fi.leif.android.voicecommands.R
 import fi.leif.android.voicecommands.mappers.RtcTypeMapper
-import fi.leif.android.voicecommands.viewmodel.Constants
 import fi.leif.voicecommands.ParameterKeys
 import fi.leif.voicecommands.RtcType
 
@@ -31,14 +30,11 @@ abstract class RtcFragment: ActionFragment() {
     }
 
     private fun handleNoContacts() {
-        // If we have no RTC contacts we default to send message to phone contacts
         viewModel.noRtcContacts.observe(viewLifecycleOwner) {
             if(it) {
                 val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
                 rtcTextView.isEnabled = false
-                viewModel.setSelectedRtcType(RtcType.MESSAGE)
-                viewModel.fetchPhoneContacts()
-                setCommand()
+                initCommand()
             }
         }
     }

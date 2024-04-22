@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
 

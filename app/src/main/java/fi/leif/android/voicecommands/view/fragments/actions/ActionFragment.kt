@@ -16,15 +16,15 @@ abstract class ActionFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setCommand()
+        initCommand()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.command.observe(viewLifecycleOwner) {  setUpdateMode(it) }
+        viewModel.command.observe(viewLifecycleOwner) { setUpdateMode(it) }
     }
 
-    protected fun setCommand() {
+    protected fun initCommand() {
         val sEditMode = arguments?.getString(Constants.KEY_EDIT_MODE)
         val editMode = sEditMode?.let { EditMode.valueOf(it) } ?: EditMode.NEW_COMMAND
         if(editMode == EditMode.DEFAULT_COMMAND) {
