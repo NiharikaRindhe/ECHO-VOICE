@@ -42,13 +42,21 @@ class ActionViewModel(application: Application) : AndroidViewModel(application) 
     private var _contacts = MutableLiveData<List<Contact>>()
     val contacts: LiveData<List<Contact>> = _contacts
 
+    private var _noRtcContacts = MutableLiveData(false)
+    val noRtcContacts = _noRtcContacts
+
     private var _whatsAppContacts = MutableLiveData<List<Contact>>()
     fun fetchWhatsAppContacts() {
-        // TODO: RTC Type requires difference contact types?
         if(_whatsAppContacts.value == null) {
             viewModelScope.launch {
-                _whatsAppContacts.value = contactsRepository.getWhatsAppVoipContacts()
-                _contacts.value = _whatsAppContacts.value
+                val contacts = contactsRepository.getWhatsAppVoipContacts()
+                if(contacts.isNotEmpty()) {
+                    _noRtcContacts.value = false
+                    _whatsAppContacts.value = contactsRepository.getWhatsAppVoipContacts()
+                    _contacts.value = _whatsAppContacts.value
+                } else {
+                    _noRtcContacts.value = true
+                }
             }
         } else {
             _contacts.value = _whatsAppContacts.value
@@ -59,8 +67,14 @@ class ActionViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchTelegramContacts() {
         if(_telegramContacts.value == null) {
             viewModelScope.launch {
-                _telegramContacts.value = contactsRepository.getTelegramCallContacts()
-                _contacts.value = _telegramContacts.value
+                val contacts = contactsRepository.getTelegramCallContacts()
+                if(contacts.isNotEmpty()) {
+                    _noRtcContacts.value = false
+                    _telegramContacts.value = contactsRepository.getTelegramCallContacts()
+                    _contacts.value = _telegramContacts.value
+                } else {
+                    _noRtcContacts.value = true
+                }
             }
         } else {
             _contacts.value = _telegramContacts.value

@@ -51,13 +51,9 @@ class OpenAppFragment: ActionFragment() {
     }
 
     override fun setUpdateMode(command: Command) {
-        if (command.action == Action.OPEN_APP) {
-            val appValue: String? = getParamVal(command, ParameterKeys.APP_PACKAGE)
-            appValue?.let {
-                viewModel.setSelectedAppByValue(it)
-            }
-        } else {
-            viewModel.setSelectedAppByPosition(0)
+        val appValue: String? = getParamVal(command, ParameterKeys.APP_PACKAGE)
+        appValue?.let {
+            viewModel.setSelectedAppByValue(it)
         }
     }
 

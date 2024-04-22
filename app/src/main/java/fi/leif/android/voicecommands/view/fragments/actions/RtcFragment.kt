@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import fi.leif.android.voicecommands.R
 import fi.leif.android.voicecommands.mappers.RtcTypeMapper
+import fi.leif.android.voicecommands.viewmodel.Constants
 import fi.leif.voicecommands.ParameterKeys
 import fi.leif.voicecommands.RtcType
 
@@ -24,8 +25,22 @@ abstract class RtcFragment: ActionFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initContacts()
         initRtcTypes()
+        initContacts()
+        handleNoContacts()
+    }
+
+    private fun handleNoContacts() {
+        // If we have no RTC contacts we default to send message to phone contacts
+        viewModel.noRtcContacts.observe(viewLifecycleOwner) {
+            if(it) {
+                val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
+                rtcTextView.isEnabled = false
+                viewModel.setSelectedRtcType(RtcType.MESSAGE)
+                viewModel.fetchPhoneContacts()
+                setCommand()
+            }
+        }
     }
 
     protected open fun initRtcTypes() {
@@ -63,7 +78,7 @@ abstract class RtcFragment: ActionFragment() {
         }
         // Contacts arrives
         viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
-            val newContacts = listOf(null) + contacts // // First element in view is empty
+            val newContacts = listOf(null) + contacts // First element in view is empty
             val items = newContacts.map { cont -> cont?.name ?: "" }
                 .toTypedArray()
                 .sortedArray()

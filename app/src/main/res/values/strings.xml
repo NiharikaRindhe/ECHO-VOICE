@@ -25,6 +25,7 @@
     <string name="action_spotify">Spotify</string>
     <string name="action_netflix">Netflix</string>
     <string name="action_open_app">Open Application</string>
+    <string name="action_none">No Action</string>
     <string name="unrecognized">Unrecognized</string>
 
     <string name="desc_destination">- \'%1$s\'</string>

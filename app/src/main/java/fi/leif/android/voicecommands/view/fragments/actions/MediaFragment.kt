@@ -35,10 +35,6 @@ class MediaFragment: ActionFragment() {
 
     override fun setUpdateMode(command: Command) {
         val input: TextInputEditText = requireView().findViewById(R.id.search_media_input)
-        if (command.action == Action.SPOTIFY || command.action == Action.NETFLIX) {
-            input.setText(getParamVal(command, ParameterKeys.SEARCH_VALUE))
-        } else {
-            input.setText("")
-        }
+        input.setText(getParamVal(command, ParameterKeys.SEARCH_VALUE))
     }
 }

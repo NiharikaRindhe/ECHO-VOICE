@@ -14,6 +14,7 @@ import fi.leif.android.voicecommands.executors.WhatsAppExecutor
 import fi.leif.android.voicecommands.view.fragments.actions.ActionFragment
 import fi.leif.android.voicecommands.view.fragments.actions.MediaFragment
 import fi.leif.android.voicecommands.view.fragments.actions.NavFragment
+import fi.leif.android.voicecommands.view.fragments.actions.NoneFragment
 import fi.leif.android.voicecommands.view.fragments.actions.OpenAppFragment
 import fi.leif.android.voicecommands.view.fragments.actions.PhoneCallFragment
 import fi.leif.android.voicecommands.view.fragments.actions.TelegramFragment
@@ -26,6 +27,7 @@ class ActionMapper {
     companion object {
 
         private val actions = listOf(
+            NONE,
             GOOGLE_MAPS,
             WAZE,
             PHONE_CALL,
@@ -38,6 +40,7 @@ class ActionMapper {
 
         fun getActionName(context: Context, action: Action): String {
             val resourceId: Int = when(action) {
+                NONE -> R.string.action_none
                 GOOGLE_MAPS -> R.string.action_google_maps
                 WAZE -> R.string.action_waze
                 PHONE_CALL -> R.string.action_phone_call
@@ -51,8 +54,11 @@ class ActionMapper {
             return context.getString(resourceId)
         }
 
-        fun getAllActionNames(context: Context): Array<String> {
+        fun getAllActionNames(context: Context, showNoAction: Boolean = false): Array<String> {
             return actions
+                .filter {
+                    if(it == NONE && showNoAction == false) false else true
+                }
                 .map { action -> getActionName(context, action) }
                 .toTypedArray()
         }
@@ -63,8 +69,9 @@ class ActionMapper {
 
         fun getActionFragment(action: Action): ActionFragment {
             return when(action) {
-                WHATSAPP -> WhatsAppFragment()
+                NONE -> NoneFragment()
                 TELEGRAM -> TelegramFragment()
+                WHATSAPP -> WhatsAppFragment()
                 PHONE_CALL -> PhoneCallFragment()
                 OPEN_APP -> OpenAppFragment()
                 WAZE -> NavFragment()

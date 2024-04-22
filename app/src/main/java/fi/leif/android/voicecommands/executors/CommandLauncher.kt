@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import fi.leif.android.voicecommands.mappers.ActionMapper
 import fi.leif.android.voicecommands.repositories.settings.SettingsRepository
+import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,7 @@ class CommandLauncher(val context: Context) {
             if(command != null) {
                 ActionMapper.getActionExecutor(command.action)
                     .execute(context, text, command)
-            } else {
+            } else if(defaultCommand.action != Action.NONE) {
                 ActionMapper.getActionExecutor(defaultCommand.action)
                     .execute(context, text, defaultCommand)
             }

@@ -109,12 +109,14 @@ class EditCommandActivity : AppCompatActivity() {
     }
 
     private fun initActions(commandIndex: Int?) {
-        val actions: Array<String> = ActionMapper.getAllActionNames(this)
+        val defaultCommand = (editMode == DEFAULT_COMMAND)
+        val actions: Array<String> = ActionMapper.getAllActionNames(this, defaultCommand)
         val actionsView: AutoCompleteTextView = findViewById(R.id.action)
         actionsView.threshold = Int.MAX_VALUE
         actionsView.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, actions))
         actionsView.setOnItemClickListener { _, _, pos, _ ->
-            val action = ActionMapper.getActionAt(pos)
+            val p = if(defaultCommand) pos else pos+1 // Default command has addition action
+            val action = ActionMapper.getActionAt(p)
             viewModel.setSelectedAction(action)
         }
         // Handle Action changed

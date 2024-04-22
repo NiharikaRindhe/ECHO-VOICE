@@ -35,10 +35,6 @@ class NavFragment: ActionFragment() {
 
     override fun setUpdateMode(command: Command) {
         val input: TextInputEditText = requireView().findViewById(R.id.destination_input)
-        if (command.action == Action.GOOGLE_MAPS || command.action == Action.WAZE) {
-            input.setText(getParamVal(command, ParameterKeys.DESTINATION))
-        } else {
-            input.setText("")
-        }
+        input.setText(getParamVal(command, ParameterKeys.DESTINATION))
     }
 }

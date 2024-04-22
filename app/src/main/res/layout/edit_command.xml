@@ -29,6 +29,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Existing commands -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/command_words"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true" />
+
                 <!-- Command input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/command_layout"
@@ -43,13 +50,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Existing commands -->
-                <com.google.android.material.chip.ChipGroup
-                       android:id="@+id/command_words"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:animateLayoutChanges="true" />
 
                 <!-- Info text -->
                 <TextView

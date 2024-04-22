@@ -26,6 +26,7 @@ enum Action {
     SPOTIFY = 5;
     NETFLIX = 6;
     OPEN_APP = 7;
+    NONE = 8;
 }
 
 enum ParameterKeys {

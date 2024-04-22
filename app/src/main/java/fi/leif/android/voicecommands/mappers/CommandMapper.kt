@@ -54,6 +54,7 @@ internal class CommandMapper {
                         "$action "+String.format(context.getString(R.string.desc_package), appName)
                     } else action
                 }
+                NONE -> return action
                 null, Action.UNRECOGNIZED -> throw IllegalArgumentException("Unknown action ${command.action}")
             }
         }

@@ -11,7 +11,7 @@ import fi.leif.voicecommands.ParameterKeys
 class NetflixExecutor : Executor(Action.NETFLIX, "com.netflix.mediaclient") {
 
     companion object {
-        const val SEARCH_ACTIVITY = "com.netflix.mediaclient.ui.search.SearchActivitys"
+        const val SEARCH_ACTIVITY = "com.netflix.mediaclient.ui.search.SearchActivity"
         const val UI_ACTIVITY = "com.netflix.mediaclient.ui.launch.UIWebViewActivity"
     }
     override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {

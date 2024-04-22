@@ -35,12 +35,8 @@ class PhoneCallFragment: RtcFragment() {
     }
 
     override fun setUpdateMode(command: Command) {
-        if(command.action == Action.PHONE_CALL) {
-            val contactValue: String? = getParamVal(command, ParameterKeys.CONTACT_ID)
-            contactValue?.let { viewModel.setSelectedContactByValue(it) }
-        } else {
-            viewModel.setSelectedContact(null)
-        }
+       val contactValue: String? = getParamVal(command, ParameterKeys.CONTACT_ID)
+       contactValue?.let { viewModel.setSelectedContactByValue(it) }
     }
 
     override fun initRtcTypes() {}

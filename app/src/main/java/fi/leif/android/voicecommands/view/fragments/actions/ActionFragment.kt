@@ -16,21 +16,23 @@ abstract class ActionFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setCommand()
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.command.observe(viewLifecycleOwner) {  setUpdateMode(it) }
+    }
+
+    protected fun setCommand() {
         val sEditMode = arguments?.getString(Constants.KEY_EDIT_MODE)
         val editMode = sEditMode?.let { EditMode.valueOf(it) } ?: EditMode.NEW_COMMAND
-
         if(editMode == EditMode.DEFAULT_COMMAND) {
             viewModel.setDefaultCommand()
         } else if(editMode == EditMode.UPDATE_COMMAND) {
             val commandIndex: Int? = arguments?.getInt(Constants.KEY_COMMAND_INDEX)
             commandIndex?.let { viewModel.setCommand(it) }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.command.observe(viewLifecycleOwner) {  setUpdateMode(it) }
     }
 
     protected fun getParamVal(command: Command, paramKey: ParameterKeys): String? {

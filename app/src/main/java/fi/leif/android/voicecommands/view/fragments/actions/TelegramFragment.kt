@@ -12,16 +12,10 @@ class TelegramFragment: RtcFragment() {
     }
 
     override fun setUpdateMode(command: Command) {
-        if(command.action == Action.TELEGRAM) {
-            val rtcValue: String? = getParamVal(command, ParameterKeys.RTC_TYPE)
-            rtcValue?.let { viewModel.setSelectedRtcType(RtcType.valueOf(it)) }
-
-            val contactValue: String? = getParamVal(command, ParameterKeys.CONTACT_ID)
-            contactValue?.let { viewModel.setSelectedContactByValue(it) }
-        } else {
-            viewModel.setSelectedRtcType(RtcType.MESSAGE)
-            viewModel.setSelectedContact(null)
-        }
+        val rtcValue: String? = getParamVal(command, ParameterKeys.RTC_TYPE)
+        rtcValue?.let { viewModel.setSelectedRtcType(RtcType.valueOf(it)) }
+        val contactValue: String? = getParamVal(command, ParameterKeys.CONTACT_ID)
+        contactValue?.let { viewModel.setSelectedContactByValue(it) }
     }
 
 }
