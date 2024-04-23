@@ -61,14 +61,6 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, ListCommandsActivity::class.java))
         }
 
-        // Edit default command button
-        val editDefaultCmdBtn: Button = findViewById(R.id.edit_default_command)
-        editDefaultCmdBtn.setOnClickListener{
-            val intent = Intent(this, EditCommandActivity::class.java)
-            intent.putExtra(Constants.KEY_EDIT_MODE, EditMode.DEFAULT_COMMAND.name)
-            startActivity(Intent(intent))
-        }
-
         // RMS DB input & layout
         val rmsLayout: TextInputLayout = findViewById(R.id.rms_db_layout)
         rmsLayout.hint = getString(R.string.hint_rms_db, viewModel.recMaxRmsDb.value)

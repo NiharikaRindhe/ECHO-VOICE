@@ -34,6 +34,7 @@ abstract class RtcFragment: ActionFragment() {
             if(it) {
                 val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
                 rtcTextView.isEnabled = false
+                rtcTextView.isFocusable = false
                 initCommand()
             }
         }

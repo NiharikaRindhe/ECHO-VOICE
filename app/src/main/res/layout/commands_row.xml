@@ -36,6 +36,7 @@
         android:gravity="center"
         >
         <ImageButton
+            android:layout_marginRight="5dp"
             android:contentDescription="@string/delete_command_title"
             android:background="@null"
             android:id="@+id/delete_btn"

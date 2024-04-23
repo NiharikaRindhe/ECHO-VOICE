@@ -32,6 +32,7 @@
             app:layout_constraintTop_toBottomOf="@id/top_bar">
 
             <LinearLayout
+                android:padding="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -39,6 +40,7 @@
                 <!-- System Language -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/system_language_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/system_language">
@@ -53,7 +55,8 @@
 
                 <!-- Extra Languages -->
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:paddingTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/extra_language"
@@ -69,6 +72,8 @@
                 <!-- Max rmsDb value -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/rms_db_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:paddingTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_rms_db">
@@ -80,8 +85,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                 </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </ScrollView>
 
-                <!-- List/default command buttons -->
+        <!-- bottom bar -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toBottomOf="@id/content">
+
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/colorPrimary">
+
+                <!-- Edit commands buttons -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/edit_commands"
                     android:layout_width="wrap_content"
@@ -89,22 +108,12 @@
                     android:layout_gravity="end"
                     android:text="@string/edit_commands"
                     android:width="300dp"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="5dp"
                     app:icon="@android:drawable/ic_menu_edit" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/edit_default_command"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:text="@string/default_command"
-                    android:width="300dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginTop="10dp"
-                    app:icon="@android:drawable/ic_menu_edit" />
 
-            </LinearLayout>
-        </ScrollView>
+            </com.google.android.material.bottomappbar.BottomAppBar>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

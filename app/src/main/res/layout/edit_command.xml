@@ -25,6 +25,7 @@
             app:layout_constraintTop_toBottomOf="@id/top_bar">
 
             <LinearLayout
+                android:padding="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -43,12 +44,12 @@
                         android:paddingEnd="15dp"
                         style="@style/TextAppearance.AppCompat.Medium"
                         android:layout_height="match_parent"/>
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/command_words"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:animateLayoutChanges="true" />
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/command_words"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true" />
                 </LinearLayout>
 
                 <!-- Command input -->
@@ -58,6 +59,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/command_input"
                     app:endIconDrawable="@android:drawable/ic_input_add"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     app:endIconMode="custom">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -79,10 +81,12 @@
 
                 <!-- Choose Action -->
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:paddingTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/action"
+
                     android:labelFor="@+id/action">
 
                     <AutoCompleteTextView
@@ -93,6 +97,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <FrameLayout
+                    android:paddingTop="10dp"
                     android:id="@+id/action_frame"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -118,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="15dp"
+                    android:layout_marginEnd="5dp"
                     android:text="@string/save"
                     app:icon="@android:drawable/ic_menu_save" />
             </com.google.android.material.bottomappbar.BottomAppBar>

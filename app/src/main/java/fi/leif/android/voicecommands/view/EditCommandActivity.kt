@@ -147,11 +147,7 @@ class EditCommandActivity : AppCompatActivity() {
     }
 
     private fun goBack() {
-        if(editMode == DEFAULT_COMMAND) {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        } else {
-            startActivity(Intent(this, ListCommandsActivity::class.java))
-        }
+        startActivity(Intent(this, ListCommandsActivity::class.java))
     }
 
     private fun initSaveButton() {

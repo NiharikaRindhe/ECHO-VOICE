@@ -34,6 +34,14 @@ class ListCommandsActivity : AppCompatActivity(), CommandsListListener {
             commandsAdapter.notifyDataSetChanged()
         }
 
+        // Edit default command button
+        val editDefaultCmdBtn: Button = findViewById(R.id.edit_default_command)
+        editDefaultCmdBtn.setOnClickListener{
+            val intent = Intent(this, EditCommandActivity::class.java)
+            intent.putExtra(Constants.KEY_EDIT_MODE, EditMode.DEFAULT_COMMAND.name)
+            startActivity(Intent(intent))
+        }
+
         // Add command button
         val addBtn: Button = findViewById(R.id.add_command)
         addBtn.setOnClickListener{

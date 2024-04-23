@@ -6,7 +6,7 @@
 
     <!-- Action: Real-Time-Communication type -->
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_rtc_type">
@@ -20,7 +20,8 @@
 
     <!-- Action: Select Contacts dropdown -->
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:paddingTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_contact">
