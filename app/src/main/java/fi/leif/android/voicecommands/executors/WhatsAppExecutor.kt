@@ -14,7 +14,7 @@ class WhatsAppExecutor: Executor(
         "com.whatsapp"
     ) {
 
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
         // Contact from settings, or match to spoken name
         val rtcType = getParameter(configCommand, ParameterKeys.RTC_TYPE)
             ?: AUDIO_CALL.toString() // Default to audio call
@@ -31,7 +31,7 @@ class WhatsAppExecutor: Executor(
         }
     }
 
-    private fun getAudioCallIntent(context: Context,
+    private suspend fun getAudioCallIntent(context: Context,
                                    settingsContactId: String?,
                                    cleanText: String): Intent? {
         val intent = Intent(Intent.ACTION_VIEW)

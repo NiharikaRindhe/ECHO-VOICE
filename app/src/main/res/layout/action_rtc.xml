@@ -1,37 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Action: Real-Time-Communication type -->
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    <data>
+        <variable name="viewModel" type="fi.leif.android.voicecommands.viewmodel.ActionViewModel" />
+        <variable name="lifecycleOwner" type="androidx.lifecycle.LifecycleOwner" />
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_rtc_type">
+        android:orientation="vertical">
 
-        <AutoCompleteTextView
-            android:id="@+id/rtc_type"
+        <!-- Action: Real-Time-Communication type -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="@string/hint_rtc_type">
 
-    <!-- Action: Select Contacts dropdown -->
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:paddingTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/hint_contact">
+            <AutoCompleteTextView
+                android:id="@+id/rtc_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:text="@{viewModel.selectedRtcTypeName}"
+                android:onItemClick="@{(p,v,pos,i) -> viewModel.setSelectedRtcTypeNameByPosition(pos)}"
+                app:items="@{viewModel.rtcTypeNames}"
+                app:lifecycle="@{lifecycleOwner}" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <AutoCompleteTextView
-            android:id="@+id/contacts"
+        <!-- Action: Select Contacts dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"
-            android:text="@{viewModel.selectedContact.name}" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="@string/hint_contact"
+            android:paddingTop="10dp">
 
-</LinearLayout>
+            <AutoCompleteTextView
+                android:id="@+id/contacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:onItemClick="@{(p,v,pos,i) -> viewModel.setSelectedContactByPosition(pos)}"
+                android:text="@{viewModel.selectedContact.name}"
+                app:contacts="@{viewModel.contacts}"
+                app:lifecycle="@{lifecycleOwner}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+</layout>

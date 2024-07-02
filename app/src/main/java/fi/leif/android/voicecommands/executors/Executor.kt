@@ -8,7 +8,7 @@ import fi.leif.voicecommands.ParameterKeys
 
 abstract class Executor(val action: Action, val packageName: String? = null) {
 
-    fun execute(context: Context, spokenText: String, configCommand: Command) {
+    suspend fun execute(context: Context, spokenText: String, configCommand: Command) {
         // Clean up command words
         val cleanText = removeCommandWords(spokenText.lowercase(),configCommand)
         if(packageName == null)
@@ -17,7 +17,7 @@ abstract class Executor(val action: Action, val packageName: String? = null) {
             executeWithPackageName(context, cleanText, configCommand)
     }
 
-    private fun executeWithPackageName(context: Context, cleanText: String, configCommand: Command) {
+    private suspend fun executeWithPackageName(context: Context, cleanText: String, configCommand: Command) {
         // No spoken text nor configured parameters => just open intent by package name
         // TODO: Maybe move this logic into sub executors instead..
         if(cleanText.isEmpty() && configCommand.parametersMap.isNullOrEmpty()) {
@@ -38,7 +38,7 @@ abstract class Executor(val action: Action, val packageName: String? = null) {
         }
     }
 
-    private fun executeWithoutPackageName(context: Context, cleanText: String,
+    private suspend fun executeWithoutPackageName(context: Context, cleanText: String,
                                           configCommand: Command) {
         val intent = getIntent(context, cleanText, configCommand)
         intent?.let {
@@ -53,7 +53,7 @@ abstract class Executor(val action: Action, val packageName: String? = null) {
         return txt.trim().replace(" +", " ")
     }
 
-    abstract fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent?
+    abstract suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent?
 
     protected fun getParameter(command: Command, key: ParameterKeys): String? {
         return command.parametersMap[key.toString()]

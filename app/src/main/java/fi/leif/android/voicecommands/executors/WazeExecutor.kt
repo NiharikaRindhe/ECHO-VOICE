@@ -7,6 +7,8 @@ import android.net.Uri
 import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -16,16 +18,18 @@ class WazeExecutor: DeepLinkExecutor(
     "com.waze",
     "https://waze.com/ul?navigate=yes") {
 
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
         val txt = getParameterOrText(cleanText, configCommand, ParameterKeys.DESTINATION)
         val (latitude,longitude) = getLocation(context, txt)
         // Unable to determine latitude/longitude, make a search by address
         return if(latitude == null || longitude == null) {
             Intent(Intent.ACTION_VIEW,
                 Uri.parse(
-                    "$uri&q=" + URLEncoder.encode(
-                        txt, StandardCharsets.UTF_8.toString()
-                    )
+                    "$uri&q=" + withContext(Dispatchers.IO) {
+                        URLEncoder.encode(
+                            txt, StandardCharsets.UTF_8.toString()
+                        )
+                    }
                 )
             )
         }

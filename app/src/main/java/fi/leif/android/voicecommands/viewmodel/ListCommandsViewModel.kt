@@ -5,36 +5,33 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fi.leif.android.voicecommands.repositories.settings.SettingsRepository
 import fi.leif.voicecommands.Command
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ListCommandsViewModel (application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ListCommandsViewModel @Inject constructor(
+    application: Application,
+    private val settingsRepository: SettingsRepository,
+) : AndroidViewModel(application) {
 
-    // // TODO: Dependency injection
-    private val _settingsRepository = SettingsRepository(application)
+    suspend fun fetchCommands() {
+        _commands.value = settingsRepository.getSettings().first().commandsList
+    }
 
     private var _commands = MutableLiveData<List<Command>>()
     val commands: LiveData<List<Command>> = _commands
 
     var isDeleted = MutableLiveData(false)
 
-    init {
-        viewModelScope.launch {
-            launch {
-                _settingsRepository.getSettings().collect {
-                    _commands.value = it.commandsList
-                }
-            }
-        }
-    }
-
     fun deleteCommand(position: Int) {
         viewModelScope.launch {
             isDeleted.value = false
-            _settingsRepository.deleteCommand(position)
+            settingsRepository.deleteCommand(position)
             isDeleted.value = true
         }
     }
-
 }

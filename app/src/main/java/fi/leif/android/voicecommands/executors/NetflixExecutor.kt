@@ -14,7 +14,7 @@ class NetflixExecutor : Executor(Action.NETFLIX, "com.netflix.mediaclient") {
         const val SEARCH_ACTIVITY = "com.netflix.mediaclient.ui.search.SearchActivity"
         const val UI_ACTIVITY = "com.netflix.mediaclient.ui.launch.UIWebViewActivity"
     }
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
         val txt = getParameterOrText(cleanText, configCommand, ParameterKeys.SEARCH_VALUE)
         // Unfortunately search activity seems to be removed in later Netflix versions :(
         return if(AppRepository(context).isActivityAvailable(packageName!!, SEARCH_ACTIVITY)) {

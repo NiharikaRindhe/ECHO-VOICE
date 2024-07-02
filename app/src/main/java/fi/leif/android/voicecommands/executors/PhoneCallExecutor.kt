@@ -9,7 +9,7 @@ import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
 
 class PhoneCallExecutor : Executor(Action.OPEN_APP) {
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
         // Settings contact  number
         val settingsTelNr = getParameter(configCommand,ParameterKeys.CONTACT_PHONE)
         return if(settingsTelNr != null) {
@@ -17,6 +17,7 @@ class PhoneCallExecutor : Executor(Action.OPEN_APP) {
         }
         // Attempt to resolve contact by spoken name
         else {
+            // TODO: Dependency inject?
             val contactsRepo = ContactsRepository(context)
             val contacts = contactsRepo.getPhoneContacts()
             val contactMatch = contactsRepo.findClosestMatchingName(contacts, cleanText)

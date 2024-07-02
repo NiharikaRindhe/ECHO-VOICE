@@ -4,20 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.google.android.material.textfield.TextInputEditText
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Command
+import fi.leif.android.voicecommands.databinding.ActionMediaBinding
 import fi.leif.voicecommands.ParameterKeys
 
+@AndroidEntryPoint
 class MediaFragment: ActionFragment() {
+
+    private lateinit var binding: ActionMediaBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         parent: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, parent, savedInstanceState)
-        return inflater.inflate(R.layout.action_media, parent, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.action_media, parent, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        return binding.root
     }
 
     override fun isValid(): Boolean {
@@ -32,8 +40,11 @@ class MediaFragment: ActionFragment() {
         return params
     }
 
-    override fun setUpdateMode(command: Command) {
-        val input: TextInputEditText = requireView().findViewById(R.id.search_media_input)
-        input.setText(getParamVal(command, ParameterKeys.SEARCH_VALUE))
+    override fun setValues() {
+        viewModel.setSearchValue(getParamVal(ParameterKeys.SEARCH_VALUE))
     }
+
+    override suspend fun fetchValues() {
+    }
+
 }

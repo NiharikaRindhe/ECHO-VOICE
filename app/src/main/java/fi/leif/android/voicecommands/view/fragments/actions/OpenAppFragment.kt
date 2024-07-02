@@ -4,60 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
+import androidx.databinding.DataBindingUtil
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Command
+import fi.leif.android.voicecommands.databinding.ActionOpenAppBinding
 import fi.leif.voicecommands.ParameterKeys
 
+@AndroidEntryPoint
 class OpenAppFragment: ActionFragment() {
+
+    private lateinit var binding: ActionOpenAppBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         parent: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, parent, savedInstanceState)
-        return inflater.inflate(R.layout.action_open_app, parent, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.action_open_app, parent, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initApps()
+    override fun setValues() {
+        val appValue: String? = getParamVal(ParameterKeys.APP_PACKAGE)
+        appValue?.let { viewModel.setSelectedAppByValue(it) }
     }
 
-    private fun initApps() {
-        // Apps dropdown
-        val appsView: AutoCompleteTextView = requireView().findViewById(R.id.apps)
-        appsView.threshold = Int.MAX_VALUE
-        // Selection changed
-        appsView.setOnItemClickListener { _, _, pos, _ ->
-            viewModel.setSelectedAppByPosition(pos)
-        }
-        // Update selected text
-        viewModel.selectedApp.observe(viewLifecycleOwner) { appsView.setText(it.name) }
-        // App list arrives
-        viewModel.apps.observe(viewLifecycleOwner) { apps ->
-            val items = apps.map { app -> app.name }.toTypedArray().sortedArray()
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
-            appsView.setAdapter(adapter)
-            // Default to first app in list
-            val selectedApp = viewModel.selectedApp.value
-            if(selectedApp == null) viewModel.setSelectedAppByPosition(0)
-        }
-        // Fetch contacts
+    override suspend fun fetchValues() {
         viewModel.fetchApps()
     }
 
-    override fun setUpdateMode(command: Command) {
-        val appValue: String? = getParamVal(command, ParameterKeys.APP_PACKAGE)
-        appValue?.let {
-            viewModel.setSelectedAppByValue(it)
-        }
-    }
-
     override fun isValid(): Boolean {
-        return true
+        return true // No validation
     }
 
     override fun getParameters(): Map<String, String> {

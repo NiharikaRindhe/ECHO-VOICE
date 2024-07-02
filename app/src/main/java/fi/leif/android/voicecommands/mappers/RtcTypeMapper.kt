@@ -14,28 +14,27 @@ class RtcTypeMapper {
             AUDIO_CALL
         )
 
-        fun getRtcTypeName(context: Context, rtcType: String): String {
-            return getRtcTypeName(context, valueOf(rtcType))
+        fun getRtcTypeName(context: Context?, rtcType: String?): String {
+            return rtcType?.let { getRtcTypeName(context, valueOf(rtcType)) } ?: ""
         }
 
-        fun getRtcTypeName(context: Context, rtcType: RtcType): String {
+        fun getRtcTypeName(context: Context?, rtcType: RtcType): String {
             val resourceId: Int = when(rtcType) {
                 MESSAGE -> R.string.rtc_type_message
                 AUDIO_CALL -> R.string.rtc_type_audio
                 VIDEO_CALL -> R.string.rtc_type_video
                 UNRECOGNIZED -> R.string.unrecognized
             }
-            return context.getString(resourceId)
+            return context?.getString(resourceId) ?: ""
         }
 
-        fun getAllRtcTypeNames(context: Context): Array<String> {
+        fun getRtcType(context: Context?, rtcTypeName: String?): RtcType {
+            return rtcTypeName?.let { getRtcType(context, it) } ?: UNRECOGNIZED
+        }
+
+        fun getAllRtcTypeNames(context: Context?): List<String> {
             return rtc_types
                 .map { rtcType -> getRtcTypeName(context, rtcType) }
-                .toTypedArray()
-        }
-
-        fun getRtcTypeAt(position: Int): RtcType {
-            return rtc_types[position]
         }
     }
 }

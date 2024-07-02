@@ -6,6 +6,8 @@ import android.net.Uri
 import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -14,11 +16,13 @@ class GoogleMapsExecutor : DeepLinkExecutor(
     "com.google.android.apps.maps",
     "google.navigation:q=") {
 
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
         val txt = getParameterOrText(cleanText, configCommand, ParameterKeys.DESTINATION)
         return Intent(
             Intent.ACTION_VIEW,
-            Uri.parse(uri + URLEncoder.encode(txt, StandardCharsets.UTF_8.toString()))
+            Uri.parse(uri + withContext(Dispatchers.IO) {
+                URLEncoder.encode(txt, StandardCharsets.UTF_8.toString())
+            })
         )
     }
 }

@@ -4,24 +4,42 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Command
+import fi.leif.android.voicecommands.databinding.ActionPhoneCallBinding
 import fi.leif.voicecommands.ParameterKeys
 
-class PhoneCallFragment: RtcFragment() {
+@AndroidEntryPoint
+class PhoneCallFragment: ActionFragment() {
+
+    private lateinit var binding: ActionPhoneCallBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         parent: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, parent, savedInstanceState)
-        return inflater.inflate(R.layout.action_phone_call, parent, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.action_phone_call,
+            parent, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        return binding.root
+    }
+
+    override suspend fun fetchValues() {
+        viewModel.fetchPhoneContacts()
+    }
+
+    override fun setValues() {
+        val contactId: String? = getParamVal(ParameterKeys.CONTACT_ID)
+        contactId?.let { viewModel.setSelectedContactById(it) }
     }
 
     override fun getParameters(): Map<String, String> {
         val params: HashMap<String, String> = HashMap()
-        viewModel.selectedContact.value?.let {
+        viewModel.selectedContact.get()?.let {
             params[ParameterKeys.CONTACT_NAME.toString()] = it.name
             params[ParameterKeys.CONTACT_PHONE.toString()] = it.phone
             params[ParameterKeys.CONTACT_ID.toString()] = it.id
@@ -29,14 +47,8 @@ class PhoneCallFragment: RtcFragment() {
         return params
     }
 
-    override fun fetchContacts() {
-        viewModel.fetchPhoneContacts()
+    override fun isValid(): Boolean {
+        return true // No validation
     }
 
-    override fun setUpdateMode(command: Command) {
-       val contactValue: String? = getParamVal(command, ParameterKeys.CONTACT_ID)
-       contactValue?.let { viewModel.setSelectedContactByValue(it) }
-    }
-
-    override fun initRtcTypes() {}
 }

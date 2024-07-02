@@ -13,7 +13,7 @@ class TelegramExecutor : Executor(
     Action.TELEGRAM,
     "org.telegram.messenger"
 ) {
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
         // Contact from settings, or match to spoken name
         val rtcType = getParameter(configCommand, ParameterKeys.RTC_TYPE)
             ?: RtcType.AUDIO_CALL.toString() // Default to audio call
@@ -30,7 +30,7 @@ class TelegramExecutor : Executor(
         }
     }
 
-    private fun getAudioCallIntent(
+    private suspend fun getAudioCallIntent(
         context: Context,
         settingsContactId: String?,
         cleanText: String

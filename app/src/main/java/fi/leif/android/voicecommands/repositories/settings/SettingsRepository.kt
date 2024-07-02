@@ -9,6 +9,7 @@ import fi.leif.voicecommands.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import java.io.IOException
+import javax.inject.Singleton
 
 private const val DATA_STORE_FILE_NAME = "settings.pb"
 
@@ -20,6 +21,7 @@ private val Context.settingsDataStore: DataStore<Settings> by dataStore(
     )
 )
 
+@Singleton
 class SettingsRepository (private val context: Context) {
 
     suspend fun getSettings(): Flow<Settings>  {

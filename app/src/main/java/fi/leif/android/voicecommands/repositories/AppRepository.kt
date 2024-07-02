@@ -4,25 +4,35 @@ import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Process
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 data class App(
     val name: String,
     val pkg: String
-)
+) {
+    override fun toString(): String {
+        return name
+    }
+}
 
 class AppRepository(private val context: Context)
 {
-    fun getApplications(): List<App> {
-        val list = ArrayList<App>()
-        val launcherApps = context.getSystemService(LauncherApps::class.java)
-        val activityList = launcherApps.getActivityList(null, android.os.Process.myUserHandle())
-        for(activity in activityList) {
-            val appName = activity.label.toString()
-            val pkg = activity.applicationInfo.packageName
-            list.add(App(appName, pkg))
+    suspend fun getApplications(): List<App> {
+        return withContext(Dispatchers.IO) {
+
+            val list = ArrayList<App>()
+            val launcherApps = context.getSystemService(LauncherApps::class.java)
+            val activityList = launcherApps.getActivityList(null, Process.myUserHandle())
+            for (activity in activityList) {
+                val appName = activity.label.toString()
+                val pkg = activity.applicationInfo.packageName
+                list.add(App(appName, pkg))
+            }
+            return@withContext list.sortedBy { it.name }
         }
-        return list.sortedBy { it.name }
     }
 
     fun isActivityAvailable(packageName: String, activityClassName: String): Boolean {

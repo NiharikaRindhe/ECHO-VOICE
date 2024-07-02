@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Action: Spotify/Netflix -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search_media_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <data>
+
+        <variable
+            name="viewModel"
+            type="fi.leif.android.voicecommands.viewmodel.ActionViewModel" />
+
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_media_search">
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/search_media_input"
+        <!-- Action: Spotify/Netflix -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/search_media_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
-</LinearLayout>
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_media_search">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:text="@{viewModel.searchValue}"
+                android:id="@+id/search_media_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+</layout>

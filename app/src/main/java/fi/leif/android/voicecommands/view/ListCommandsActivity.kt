@@ -8,27 +8,33 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
 import fi.leif.android.voicecommands.view.adapters.CommandsListAdapter
 import fi.leif.android.voicecommands.view.adapters.CommandsListListener
 import fi.leif.android.voicecommands.viewmodel.Constants
 import fi.leif.android.voicecommands.viewmodel.EditMode
 import fi.leif.android.voicecommands.viewmodel.ListCommandsViewModel
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ListCommandsActivity : AppCompatActivity(), CommandsListListener {
 
     private val viewModel: ListCommandsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch { viewModel.fetchCommands() }
+
         setContentView(R.layout.list_commands)
 
         // Init Commands List View
         val commandsAdapter = CommandsListAdapter(this, ArrayList(), this)
         val commandsListView: ListView = findViewById(R.id.commands)
         commandsListView.adapter = commandsAdapter
-
         viewModel.commands.observe(this) {
             commandsAdapter.setData(it)
             commandsAdapter.notifyDataSetChanged()

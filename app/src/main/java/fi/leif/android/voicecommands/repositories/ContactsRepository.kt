@@ -6,16 +6,18 @@ import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.commons.text.similarity.LevenshteinDistance
 import java.util.Locale
 
     data class Contact(
-    val name: String,
-    val phone: String,
+        val name: String,
+        val phone: String,
     val id: String
 ) {
     override fun toString(): String {
-        return name // "$name ($value)"
+        return name ?: "" // "$name ($value)"
     }
 }
 
@@ -28,39 +30,44 @@ class ContactsRepository (private val context: Context) {
         const val DEFAULT_ALLOWED_WRONG_CHARS_PER_WORD = 1
     }
 
-    private fun getContacts(mimeType: String, idColumnName: String): List<Contact> {
+    private suspend fun getContacts(mimeType: String, idColumnName: String): List<Contact> {
 
-        val contacts = mutableListOf<Contact>()
-        val addedContacts = HashSet<String>()
+        return withContext(Dispatchers.IO) {
+            val contacts = mutableListOf<Contact>()
+            val addedContacts = HashSet<String>()
 
-        val projection = arrayOf(ContactsContract.Data.DISPLAY_NAME,
-            Phone.NUMBER,
-            idColumnName)
-        val selection = "${ContactsContract.Data.MIMETYPE}=? AND ${Phone.NUMBER} IS NOT NULL"
-        val uri = ContactsContract.Data.CONTENT_URI
-        val cursor = context.contentResolver.query(
-            uri,
-            projection,
-            selection,
-            arrayOf(mimeType),
-            ContactsContract.Data.DISPLAY_NAME + " ASC")
-        (cursor != null && cursor.count > 0).let {
-            while (cursor?.moveToNext() == true) {
-                try {
-                    val name = cursor.getString(0)
-                    val phone = cursor.getString(1).replace(" ", "")
-                    val id = cursor.getString(2)
-                    if(name != null && !addedContacts.contains(id)) {
-                        contacts.add(Contact(name, phone, id))
-                        addedContacts.add(id)
+            val projection = arrayOf(
+                ContactsContract.Data.DISPLAY_NAME,
+                Phone.NUMBER,
+                idColumnName
+            )
+            val selection = "${ContactsContract.Data.MIMETYPE}=? AND ${Phone.NUMBER} IS NOT NULL"
+            val uri = ContactsContract.Data.CONTENT_URI
+            val cursor = context.contentResolver.query(
+                uri,
+                projection,
+                selection,
+                arrayOf(mimeType),
+                ContactsContract.Data.DISPLAY_NAME + " ASC"
+            )
+            (cursor != null && cursor.count > 0).let {
+                while (cursor?.moveToNext() == true) {
+                    try {
+                        val name = cursor.getString(0)
+                        val phone = cursor.getString(1).replace(" ", "")
+                        val id = cursor.getString(2)
+                        if (name != null && !addedContacts.contains(id)) {
+                            contacts.add(Contact(name, phone, id))
+                            addedContacts.add(id)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("getContacts", e.toString(), e)
                     }
-                } catch (e: Exception) {
-                    Log.e("getContacts", e.toString(), e)
                 }
             }
+            cursor?.close()
+            return@withContext contacts
         }
-        cursor?.close()
-        return contacts
     }
 
     fun getPhoneNumberByName(contactName: String): String? {
@@ -87,24 +94,21 @@ class ContactsRepository (private val context: Context) {
         return PhoneNumberUtils.formatNumberToE164(phoneNr, tm.simCountryIso.uppercase())
     }
 
-    fun getPhoneContacts(): List<Contact> {
-        // TODO: Caching?
+    suspend fun getPhoneContacts(): List<Contact> {
         return getContacts(
             MIMETYPE_PHONE,
-            Phone.CONTACT_ID
+           Phone.CONTACT_ID
         )
-    }
+   }
 
-    fun getWhatsAppVoipContacts(): List<Contact> {
-        // TODO: Caching?
+    suspend fun getWhatsAppVoipContacts(): List<Contact> {
         return getContacts(
             MIMETYPE_WHATSAPP_VOIP,
             ContactsContract.Data._ID
         )
     }
 
-    fun getTelegramCallContacts(): List<Contact> {
-        // TODO: Caching?
+    suspend fun getTelegramCallContacts(): List<Contact> {
         return getContacts(
             MIMETYPE_TELEGRAM_CALL,
             ContactsContract.Data._ID

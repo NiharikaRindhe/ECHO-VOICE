@@ -9,7 +9,7 @@ import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.ParameterKeys
 
 class SpotifyExecutor : Executor(Action.SPOTIFY, "com.spotify.music") {
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent {
         val txt = getParameterOrText(cleanText, configCommand, ParameterKeys.SEARCH_VALUE)
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)

@@ -2,6 +2,15 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="fi.leif.android.voicecommands.viewmodel.EditCommandViewModel" />
+        <variable
+            name="lifecycleOwner"
+            type="androidx.lifecycle.LifecycleOwner" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -86,11 +95,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/action"
-
                     android:labelFor="@+id/action">
 
                     <AutoCompleteTextView
                         android:id="@+id/action"
+                        app:lifecycle="@{lifecycleOwner}"
+                        app:items="@{viewModel.actions}"
+                        android:onItemClick="@{(p,v,pos,i) -> viewModel.setSelectedActionByPosition(pos)}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none" />

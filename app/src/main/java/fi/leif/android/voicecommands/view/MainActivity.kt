@@ -7,8 +7,10 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
 import fi.leif.android.voicecommands.audio.SpeechToText
+import fi.leif.android.voicecommands.audio.SpeechToTextFactory
 import fi.leif.android.voicecommands.audio.SpeechToTextListener
 import fi.leif.android.voicecommands.executors.CommandLauncher
 import fi.leif.android.voicecommands.repositories.settings.SettingsRepository
@@ -19,17 +21,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), SpeechToTextListener {
 
     companion object {
         const val EXECUTE_DELAY_MS = 2000L
     }
 
-    // TODO: Dependency inject
-    private val settingsRepository = SettingsRepository(this)
-    private val commandLauncher = CommandLauncher(this)
-    private var stt: SpeechToText = SpeechToText(this)
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
+    @Inject
+    lateinit var commandLauncher: CommandLauncher
+
+    @Inject
+    lateinit var sttFactory: SpeechToTextFactory
+    private lateinit var stt: SpeechToText
 
     private var recMaxRms = 0f
     private var firstLoad = true
@@ -51,6 +60,7 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
     private lateinit var soundMeter: SoundLevelVisualizer
 
     private fun startListening(settings: Settings) {
+        stt = sttFactory.create(this)
         stt.start(this, settings.extraLanguage)
     }
 
@@ -64,9 +74,7 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
         // Settings button
         val setIcon: ImageView = findViewById(R.id.settings)
         setIcon.setOnClickListener {
-            stt.stop()
-            soundMeter.stop()
-            textMatcher.stop()
+            stop()
             startActivity(Intent(this, SettingsActivity::class.java))
         }
         // Quit if layout clicked
@@ -77,10 +85,14 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
         }
     }
 
-    private fun quit() {
+    private fun stop() {
         stt.stop()
         soundMeter.stop()
         textMatcher.stop()
+    }
+
+    private fun quit() {
+        stop()
         finishAffinity()
     }
 
@@ -97,8 +109,9 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
         // Execute with delay giving time to show highlight
         lifecycleScope.launch {
             delay(EXECUTE_DELAY_MS)
+            stop()
             commandLauncher.executeCommand(this@MainActivity, commandWord, text)
-            quit()
+            // quit()
         }
     }
 

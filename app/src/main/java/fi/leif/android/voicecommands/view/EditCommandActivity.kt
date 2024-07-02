@@ -3,7 +3,6 @@ package fi.leif.android.voicecommands.view
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
@@ -11,13 +10,17 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
+import fi.leif.android.voicecommands.databinding.EditCommandBinding
 import fi.leif.android.voicecommands.mappers.ActionMapper
 import fi.leif.android.voicecommands.view.fragments.actions.ActionFragment
 import fi.leif.android.voicecommands.viewmodel.Constants
@@ -25,10 +28,13 @@ import fi.leif.android.voicecommands.viewmodel.EditCommandViewModel
 import fi.leif.android.voicecommands.viewmodel.EditMode
 import fi.leif.android.voicecommands.viewmodel.EditMode.*
 import fi.leif.android.voicecommands.viewmodel.ValidationError
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class EditCommandActivity : AppCompatActivity() {
 
     private val viewModel: EditCommandViewModel by viewModels()
+
     private lateinit var actionFragment: ActionFragment
     private lateinit var cmdLayout: TextInputLayout
     private lateinit var cmdInput: TextInputEditText
@@ -39,20 +45,28 @@ class EditCommandActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edit_command)
 
-        // Set mode by parameters
-        val sEditMode = intent.extras?.getString(Constants.KEY_EDIT_MODE)
-        editMode = sEditMode?.let { EditMode.valueOf(it) } ?: NEW_COMMAND
-        val commandIndex = intent.extras?.getInt(Constants.KEY_COMMAND_INDEX)
-        viewModel.setMode(editMode, commandIndex)
+        // Bind viewmodel to layout xml
+        val binding: EditCommandBinding = DataBindingUtil.setContentView(
+            this, R.layout.edit_command)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
-        initCommandWordInput()
-        initTexts()
-        initCommandWordChips()
-        initActions(commandIndex)
-        initTitle()
-        initBackButton()
-        initSaveButton()
-        setValidationErrorListener()
+        lifecycleScope.launch {
+            viewModel.fetchSettings()
+            // Set mode by parameters
+            val sEditMode = intent.extras?.getString(Constants.KEY_EDIT_MODE)
+            editMode = sEditMode?.let { EditMode.valueOf(it) } ?: NEW_COMMAND
+            val commandIndex = intent.extras?.getInt(Constants.KEY_COMMAND_INDEX)
+            viewModel.setMode(editMode, commandIndex)
+            initCommandWordInput()
+            initTexts()
+            initCommandWordChips()
+            initActions(commandIndex)
+            initTitle()
+            initBackButton()
+            initSaveButton()
+            setValidationErrorListener()
+        }
     }
 
     private fun initCommandWordInput() {
@@ -79,7 +93,7 @@ class EditCommandActivity : AppCompatActivity() {
     private fun initTexts() {
         val info: TextView = findViewById(R.id.info)
         val keywordsTitle: TextView = findViewById(R.id.keywords_title)
-        if((editMode == DEFAULT_COMMAND)) {
+        if(editMode == DEFAULT_COMMAND) {
             info.visibility = View.VISIBLE
             keywordsTitle.visibility = View.GONE
         } else {
@@ -98,38 +112,46 @@ class EditCommandActivity : AppCompatActivity() {
         }
         viewModel.commandWords.observe(this) { list ->
             chipGroup.removeAllViews()
-            list.forEach { word ->
-                val chip = Chip(this)
-                chip.isCloseIconVisible = true
-                chip.text = word
-                chip.textSize = 20f
-                chip.setOnCloseIconClickListener {
-                    val c = it as Chip
-                    viewModel.removeCommandWord(c.text.toString())
-                }
-                chipGroup.addView(chip)
+            list.forEach {
+                chipGroup.addView(addChip(it))
             }
         }
     }
 
+    private fun addChip(word: String): Chip {
+        val chip = Chip(this)
+        chip.isCloseIconVisible = true
+        chip.text = word
+        chip.textSize = 20f
+        chip.setOnCloseIconClickListener {
+            val c = it as Chip
+            viewModel.removeCommandWord(c.text.toString())
+        }
+        return chip
+    }
+
     private fun initActions(commandIndex: Int?) {
         val defaultCommand = (editMode == DEFAULT_COMMAND)
-        val actions: Array<String> = ActionMapper.getAllActionNames(this, defaultCommand)
-        val actionsView: AutoCompleteTextView = findViewById(R.id.action)
-        actionsView.threshold = Int.MAX_VALUE
-        actionsView.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, actions))
-        actionsView.setOnItemClickListener { _, _, pos, _ ->
-            val p = if(defaultCommand) pos else pos+1 // Default command has addition action
-            val action = ActionMapper.getActionAt(p)
-            viewModel.setSelectedAction(action)
-        }
+        val actions: List<String> = ActionMapper.getAllActionNames(this, defaultCommand)
+        viewModel.setActions(actions)
         // Handle Action changed
+        val actionsView: AutoCompleteTextView = findViewById(R.id.action)
         viewModel.selectedAction.observe(this) {
             actionsView.setText(ActionMapper.getActionName(this, it))
             // Switch fragment
             actionFragment = ActionMapper.getActionFragment(it)
             showFragment(actionFragment, commandIndex)
         }
+    }
+
+    private fun showFragment(actionFragment: ActionFragment, commandIndex: Int? = null) {
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        val args = Bundle()
+        args.putString(Constants.KEY_EDIT_MODE, editMode.name)
+        commandIndex?.let { args.putInt(Constants.KEY_COMMAND_INDEX, it) }
+        actionFragment.arguments = args
+        ft.replace(R.id.action_frame, actionFragment)
+        ft.commit()
     }
 
     private fun initTitle() {
@@ -163,17 +185,6 @@ class EditCommandActivity : AppCompatActivity() {
                 goBack()
             }
         }
-    }
-
-    private fun showFragment(actionFragment: ActionFragment, commandIndex: Int? = null) {
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        val args = Bundle()
-        args.putString(Constants.KEY_EDIT_MODE, editMode.name)
-        commandIndex?.let { args.putInt(Constants.KEY_COMMAND_INDEX, it) }
-        actionFragment.arguments = args
-        ft.replace(R.id.action_frame, actionFragment)
-        ft.commit()
-
     }
 
     private fun setValidationErrorListener() {

@@ -54,20 +54,19 @@ class ActionMapper {
             return context.getString(resourceId)
         }
 
-        fun getAllActionNames(context: Context, showNoAction: Boolean = false): Array<String> {
+        fun getAllActionNames(context: Context, showNoAction: Boolean = false): List<String> {
             return actions
                 .filter {
                     if(it == NONE && showNoAction == false) false else true
                 }
                 .map { action -> getActionName(context, action) }
-                .toTypedArray()
         }
 
         fun getActionAt(position: Int): Action {
             return actions[position]
         }
 
-        fun getActionFragment(action: Action): ActionFragment {
+        fun getActionFragment(action: Action?): ActionFragment {
             return when(action) {
                 NONE -> NoneFragment()
                 TELEGRAM -> TelegramFragment()

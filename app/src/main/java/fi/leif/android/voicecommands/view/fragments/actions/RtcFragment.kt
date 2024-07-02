@@ -4,29 +4,41 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.databinding.DataBindingUtil
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
+import fi.leif.android.voicecommands.databinding.ActionRtcBinding
 import fi.leif.android.voicecommands.mappers.RtcTypeMapper
 import fi.leif.voicecommands.ParameterKeys
 import fi.leif.voicecommands.RtcType
 
+@AndroidEntryPoint
 abstract class RtcFragment: ActionFragment() {
+
+    private lateinit var binding: ActionRtcBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         parent: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, parent, savedInstanceState)
-        return inflater.inflate(R.layout.action_rtc, parent, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.action_rtc, parent, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRtcTypes()
-        initContacts()
         handleNoContacts()
+    }
+
+    protected open fun initRtcTypes() {
+        val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
+        rtcTextView.threshold = Int.MAX_VALUE
     }
 
     private fun handleNoContacts() {
@@ -35,84 +47,43 @@ abstract class RtcFragment: ActionFragment() {
                 val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
                 rtcTextView.isEnabled = false
                 rtcTextView.isFocusable = false
-                initCommand()
+                rtcTextView.setText(RtcTypeMapper.getRtcTypeName(context, RtcType.MESSAGE))
             }
         }
     }
 
-    protected open fun initRtcTypes() {
-        val rtcTextView: AutoCompleteTextView = requireView().findViewById(R.id.rtc_type)
-        rtcTextView.threshold = Int.MAX_VALUE
-
-        val rtcTypes: Array<String> = RtcTypeMapper.getAllRtcTypeNames(requireContext())
-        rtcTextView.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, rtcTypes))
-
-        rtcTextView.setOnItemClickListener { _, _, pos, _ ->
-            viewModel.setSelectedRtcType(RtcTypeMapper.getRtcTypeAt(pos))
-        }
-
-        viewModel.selectedRtcType.observe(viewLifecycleOwner) {
-            rtcTextView.setText(RtcTypeMapper.getRtcTypeName(requireContext(), it))
-        }
+    override suspend fun fetchValues() {
+        viewModel.setRtcTypeNames(RtcTypeMapper.getAllRtcTypeNames(context))
     }
 
-    private fun initContacts() {
-        // Contacts dropdown
-        val contactsView: AutoCompleteTextView = requireView().findViewById(R.id.contacts)
-        contactsView.threshold = Int.MAX_VALUE
-        // Selection changed
-        contactsView.setOnItemClickListener { _, _, pos, _ ->
-            if(pos == 0) viewModel.setSelectedContact(null)
-            else {
-                contactsView.error = null // Empty previous error
-                viewModel.setSelectedContactByPosition(pos - 1)
-            } // First element in view is empty
+    override fun setValues() {
+        val contactId: String? = getParamVal(ParameterKeys.CONTACT_ID)
+        contactId?.let { viewModel.setSelectedContactById(it) }
+
+        val rtcValue: String? = getParamVal(ParameterKeys.RTC_TYPE)
+        rtcValue?.let { viewModel.setSelectedRtcTypeName(RtcTypeMapper.getRtcTypeName(context,it)) }
+            ?: RtcTypeMapper.getRtcTypeName(context, RtcType.MESSAGE)
+    }
+
+    override fun getParameters(): Map<String, String> {
+        val params: HashMap<String, String> = HashMap()
+        viewModel.selectedContact.get()?.let {
+            params[ParameterKeys.CONTACT_NAME.toString()] = it.name
+            params[ParameterKeys.CONTACT_PHONE.toString()] = it.phone
+            params[ParameterKeys.CONTACT_ID.toString()] = it.id
         }
-        // Update selected text
-        viewModel.selectedContact.observe(viewLifecycleOwner) { contact ->
-            if(contact == null) contactsView.setText("") // First element in view is empty
-            else contactsView.setText(contact.name)
-        }
-        // Contacts arrives
-        viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
-            val newContacts = listOf(null) + contacts // First element in view is empty
-            val items = newContacts.map { cont -> cont?.name ?: "" }
-                .toTypedArray()
-                .sortedArray()
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
-            contactsView.setAdapter(adapter)
-        }
-        // Init
-        viewModel.setSelectedContact(null)
-        // Fetch contacts
-        fetchContacts()
+        params[ParameterKeys.RTC_TYPE.toString()] = RtcTypeMapper
+            .getRtcType(context, viewModel.selectedRtcTypeName.value).toString()
+        return params
     }
 
     override fun isValid(): Boolean {
         val contactsView: AutoCompleteTextView = requireView().findViewById(R.id.contacts)
-        if(viewModel.selectedRtcType.value == RtcType.MESSAGE &&
-            viewModel.selectedContact.value == null) {
+        if(RtcTypeMapper.getRtcType(context, viewModel.selectedRtcTypeName.value) == RtcType.MESSAGE &&
+            viewModel.selectedContact.get() == null) {
             contactsView.error = getString(R.string.error_rtc_message_recipient_empty)
             return false
         }
         return true
     }
-
-    override fun getParameters(): Map<String, String> {
-        val params: HashMap<String, String> = HashMap()
-        viewModel.selectedContact.value?.let {
-            params[ParameterKeys.CONTACT_NAME.toString()] = it.name
-            params[ParameterKeys.CONTACT_PHONE.toString()] = it.phone
-            params[ParameterKeys.CONTACT_ID.toString()] = it.id
-        }
-        viewModel.selectedRtcType.value?.let {
-            // Ignoring setting default rtc type due to Executor.executeWithPackageName()
-            // not launching getLaunchIntentForPackage when empty text - TODO: This is bit crap
-            if(it != RtcType.AUDIO_CALL)
-                params[ParameterKeys.RTC_TYPE.toString()] = it.toString()
-        }
-        return params
-    }
-
-    abstract fun fetchContacts()
 }

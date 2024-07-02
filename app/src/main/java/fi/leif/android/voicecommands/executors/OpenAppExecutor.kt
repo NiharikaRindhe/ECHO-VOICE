@@ -8,7 +8,7 @@ import fi.leif.voicecommands.ParameterKeys
 
 class OpenAppExecutor : Executor(Action.OPEN_APP) {
 
-    override fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
+    override suspend fun getIntent(context: Context, cleanText: String, configCommand: Command): Intent? {
         val pkg = configCommand.parametersMap[ParameterKeys.APP_PACKAGE.toString()]
         return pkg?.let { context.packageManager.getLaunchIntentForPackage(it) }
     }

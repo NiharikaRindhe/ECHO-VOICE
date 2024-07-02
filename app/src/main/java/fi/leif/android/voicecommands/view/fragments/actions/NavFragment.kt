@@ -4,20 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.google.android.material.textfield.TextInputEditText
+import dagger.hilt.android.AndroidEntryPoint
 import fi.leif.android.voicecommands.R
-import fi.leif.voicecommands.Command
+import fi.leif.android.voicecommands.databinding.ActionNavBinding
 import fi.leif.voicecommands.ParameterKeys
 
+@AndroidEntryPoint
 class NavFragment: ActionFragment() {
+
+    private lateinit var binding: ActionNavBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         parent: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, parent, savedInstanceState)
-        return inflater.inflate(R.layout.action_nav, parent, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.action_nav, parent, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        return binding.root
     }
 
     override fun isValid(): Boolean {
@@ -32,8 +40,10 @@ class NavFragment: ActionFragment() {
         return params
     }
 
-    override fun setUpdateMode(command: Command) {
-        val input: TextInputEditText = requireView().findViewById(R.id.destination_input)
-        input.setText(getParamVal(command, ParameterKeys.DESTINATION))
+    override suspend fun fetchValues() {
+    }
+
+    override fun setValues() {
+        viewModel.setDestination(getParamVal(ParameterKeys.DESTINATION))
     }
 }

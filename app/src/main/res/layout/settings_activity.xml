@@ -6,6 +6,9 @@
         <variable
             name="viewModel"
             type="fi.leif.android.voicecommands.viewmodel.SettingsViewModel" />
+        <variable
+            name="lifecycleOwner"
+            type="androidx.lifecycle.LifecycleOwner" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,6 +67,10 @@
 
                     <AutoCompleteTextView
                         android:id="@+id/extra_language"
+                        app:lifecycle="@{lifecycleOwner}"
+                        app:items="@{viewModel.supportedLanguages}"
+                        android:text="@{viewModel.selectedExtraLanguage}"
+                        android:onItemClick="@{(parent, view, position, id) -> viewModel.setSelectedExtraLanguage(position)}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none" />

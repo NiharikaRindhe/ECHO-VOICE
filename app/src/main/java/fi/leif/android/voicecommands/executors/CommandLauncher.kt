@@ -49,7 +49,7 @@ class CommandLauncher(val context: Context) {
         return null
     }
 
-    fun executeCommand(context: Context, cmdWord: String?, text: String) {
+    suspend fun executeCommand(context: Context, cmdWord: String?, text: String) {
         val command = wordsMap[cmdWord]
         try {
             if(command != null) {

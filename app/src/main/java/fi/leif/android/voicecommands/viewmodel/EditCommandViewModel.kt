@@ -5,25 +5,27 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import fi.leif.android.voicecommands.mappers.ActionMapper
 import fi.leif.android.voicecommands.repositories.settings.SettingsRepository
 import fi.leif.voicecommands.Action
 import fi.leif.voicecommands.Action.GOOGLE_MAPS
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.Settings
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EditCommandViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class EditCommandViewModel @Inject constructor(
+    application: Application,
+    private val settingsRepository: SettingsRepository,
+) : AndroidViewModel(application) {
 
-    // Repositories
-    // // TODO: Dependency injection
-    private val settingsRepository = SettingsRepository(application)
+    private var settings: Settings? = null
 
-    private var _settings: Settings? = null
-
-    init {
-        viewModelScope.launch {
-            launch { settingsRepository.getSettings().collect { _settings = it } }
-        }
+    suspend fun fetchSettings() {
+        settings = settingsRepository.getSettings().first()
     }
 
     // Update mode
@@ -32,13 +34,13 @@ class EditCommandViewModel(application: Application) : AndroidViewModel(applicat
     fun setMode(editMode: EditMode, existingCommandIndex: Int?) {
         _mode = editMode
         if(editMode == EditMode.DEFAULT_COMMAND) {
-            val command = _settings?.defaultCommand!!
-            setSelectedAction(command.action)
+            val command = settings?.defaultCommand
+            command?.action?.let { setSelectedAction(it) }
         } else if(editMode == EditMode.UPDATE_COMMAND && existingCommandIndex != null) {
             _updateCommandIndex = existingCommandIndex
-            val command = _settings?.getCommands(existingCommandIndex)!!
-            _commandWords.value?.addAll(command.wordsList)
-            setSelectedAction(command.action)
+            val command = settings?.getCommands(existingCommandIndex)
+            command?.wordsList?.let { _commandWords.value?.addAll(it) }
+            command?.action?.let { setSelectedAction(it) }
         }
     }
 
@@ -54,10 +56,21 @@ class EditCommandViewModel(application: Application) : AndroidViewModel(applicat
         _commandWords.value = commandWords.value // Trigger observer
     }
 
+    private var _actions = MutableLiveData<List<String>>()
+    val actions: LiveData<List<String>> = _actions
+    fun setActions(actions: List<String>){
+        _actions.value = actions
+    }
     private var _selectedAction = MutableLiveData(GOOGLE_MAPS)
     val selectedAction: LiveData<Action> = _selectedAction
     fun setSelectedAction(action: Action) {
         _selectedAction.value = action
+    }
+    fun setSelectedActionByPosition(position: Int) {
+        // Default command has an additional action
+        val pos = if(_mode == EditMode.DEFAULT_COMMAND) position else position+1
+        val action = ActionMapper.getActionAt(pos)
+        setSelectedAction(action)
     }
 
     private var _isSaved = MutableLiveData(false)
@@ -101,7 +114,7 @@ class EditCommandViewModel(application: Application) : AndroidViewModel(applicat
             _validationError.value = ValidationError.KEYWORD_EXISTS
             return false
         }
-        val exists: Command? = _settings?.commandsList?.find{ it.wordsList.contains(word) }
+        val exists: Command? = settings?.commandsList?.find{ it.wordsList.contains(word) }
         exists?.let {
             _validationError.value = ValidationError.KEYWORD_EXISTS
             return false
