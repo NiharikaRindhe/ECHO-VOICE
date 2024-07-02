@@ -1,7 +1,9 @@
 # Voice Commands
-I bought an Android Head Unit (Ainavi H6/AliExpress) for my Toyta Auris, as the factory head unit was very limited.
+I bought an Android Head Unit (Ainavi H6/AliExpress) for my Toyta Auris, as the factory Head Unit was very limited.
+
 The Android Head Unit works fine, but it has one flaw - Google Assistant does support the Finnish language, making 
 voice recognition for navigational purposes useless at least here in Finland.
+
 As a workaround I coded a custom Android App for controlling things via speech that uses Google SpeechRecognizer, hence it supports more languages.
 
 ## Demo Video
