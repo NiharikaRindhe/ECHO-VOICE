@@ -52,17 +52,14 @@ class ActionViewModel @Inject constructor(
     }
 
     private var _whatsAppContacts = MutableLiveData<List<Contact>>()
-    fun fetchWhatsAppContacts() {
+    suspend fun fetchWhatsAppContacts() {
         if(_whatsAppContacts.value == null) {
-            viewModelScope.launch {
-                val contacts = contactsRepository.getWhatsAppVoipContacts()
-                if(contacts.isNotEmpty()) {
-                    _noRtcContacts.value = false
-                    _whatsAppContacts.value = contactsRepository.getWhatsAppVoipContacts()
-                    _contacts.value = _whatsAppContacts.value
-                } else {
-                    handleNoRtcContacts()
-                }
+            _whatsAppContacts.value = contactsRepository.getWhatsAppVoipContacts()
+            if(_whatsAppContacts.value!!.isNotEmpty()) {
+                _noRtcContacts.value = false
+                _contacts.value = _whatsAppContacts.value
+            } else {
+               handleNoRtcContacts()
             }
         } else {
             _contacts.value = _whatsAppContacts.value
@@ -70,17 +67,14 @@ class ActionViewModel @Inject constructor(
     }
 
     private var _telegramContacts = MutableLiveData<List<Contact>>()
-    fun fetchTelegramContacts() {
+    suspend fun fetchTelegramContacts() {
         if(_telegramContacts.value == null) {
-            viewModelScope.launch {
-                val contacts = contactsRepository.getTelegramCallContacts()
-                if(contacts.isNotEmpty()) {
-                    _noRtcContacts.value = false
-                    _telegramContacts.value = contactsRepository.getTelegramCallContacts()
-                    _contacts.value = _telegramContacts.value
-                } else {
-                    handleNoRtcContacts()
-                }
+            _telegramContacts.value = contactsRepository.getTelegramCallContacts()
+            if(_telegramContacts.value!!.isNotEmpty()) {
+                _noRtcContacts.value = false
+                _contacts.value = _telegramContacts.value
+            } else {
+                handleNoRtcContacts()
             }
         } else {
             _contacts.value = _telegramContacts.value
@@ -103,42 +97,42 @@ class ActionViewModel @Inject constructor(
         _rtcTypeNames.value = rtcTypeNames
     }
 
-    private var _selectedRtcTypeName = MutableLiveData("")
-    val selectedRtcTypeName: LiveData<String> = _selectedRtcTypeName
+    val selectedRtcTypeName: ObservableField<String> = ObservableField("")
     fun setSelectedRtcTypeName(name: String?) {
-        _selectedRtcTypeName.value = name
+        selectedRtcTypeName.set(name)
     }
 
     fun setSelectedRtcTypeNameByPosition(position: Int) {
-        _selectedRtcTypeName.value = _rtcTypeNames.value?.get(position)
+        selectedRtcTypeName.set(_rtcTypeNames.value?.get(position))
     }
 
-    var selectedContact = ObservableField(Contact("","", ""))
+    var selectedContact = ObservableField<Contact>()
     fun setSelectedContactByPosition(position: Int) {
-        selectedContact.set(_contacts.value?.get(position))
+        if(position == 0) // First value is always empty
+            selectedContact.set(null)
+        else
+            selectedContact.set(_contacts.value?.get(position-1))
     }
+
     fun setSelectedContactById(value: String) {
         selectedContact.set(_contacts.value?.firstOrNull { it.id == value })
     }
 
     private var _apps = MutableLiveData<List<App>>()
     val apps: LiveData<List<App>> = _apps
-    fun fetchApps() {
+    suspend fun fetchApps() {
         if(_apps.value == null) {
-            viewModelScope.launch {
-                _apps.value = appRepository.getApplications()
-                setSelectedAppByPosition(0)
-            }
-        }
+            _apps.value = appRepository.getApplications()
+           setSelectedAppByPosition(0)
+         }
     }
 
-    private var _selectedApp = MutableLiveData<App>()
-    val selectedApp:LiveData<App> = _selectedApp
+    val selectedApp:ObservableField<App> = ObservableField()
     fun setSelectedAppByPosition(position: Int) {
-        _selectedApp.value = _apps.value?.get(position)
+        selectedApp.set(_apps.value?.get(position))
     }
     fun setSelectedAppByValue(value: String) {
-        _selectedApp.value = _apps.value?.firstOrNull { it.pkg == value }
+        selectedApp.set(_apps.value?.firstOrNull { it.pkg == value })
     }
 
     private var _searchValue = MutableLiveData<String>()

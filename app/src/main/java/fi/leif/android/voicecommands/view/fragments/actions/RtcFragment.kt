@@ -62,7 +62,7 @@ abstract class RtcFragment: ActionFragment() {
 
         val rtcValue: String? = getParamVal(ParameterKeys.RTC_TYPE)
         rtcValue?.let { viewModel.setSelectedRtcTypeName(RtcTypeMapper.getRtcTypeName(context,it)) }
-            ?: RtcTypeMapper.getRtcTypeName(context, RtcType.MESSAGE)
+            ?: viewModel.setSelectedRtcTypeName(RtcTypeMapper.getRtcTypeName(context, RtcType.MESSAGE))
     }
 
     override fun getParameters(): Map<String, String> {
@@ -73,13 +73,13 @@ abstract class RtcFragment: ActionFragment() {
             params[ParameterKeys.CONTACT_ID.toString()] = it.id
         }
         params[ParameterKeys.RTC_TYPE.toString()] = RtcTypeMapper
-            .getRtcType(context, viewModel.selectedRtcTypeName.value).toString()
+            .getRtcTypeByName(context, viewModel.selectedRtcTypeName.get()).toString()
         return params
     }
 
     override fun isValid(): Boolean {
         val contactsView: AutoCompleteTextView = requireView().findViewById(R.id.contacts)
-        if(RtcTypeMapper.getRtcType(context, viewModel.selectedRtcTypeName.value) == RtcType.MESSAGE &&
+        if(RtcTypeMapper.getRtcTypeByName(context, viewModel.selectedRtcTypeName.get()) == RtcType.MESSAGE &&
             viewModel.selectedContact.get() == null) {
             contactsView.error = getString(R.string.error_rtc_message_recipient_empty)
             return false

@@ -9,6 +9,7 @@ import fi.leif.android.voicecommands.viewmodel.Constants
 import fi.leif.android.voicecommands.viewmodel.EditMode
 import fi.leif.voicecommands.ParameterKeys
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 abstract class ActionFragment: Fragment() {
 

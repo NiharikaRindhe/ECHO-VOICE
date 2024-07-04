@@ -59,6 +59,7 @@ class ListCommandsActivity : AppCompatActivity(), CommandsListListener {
         // Command deleted observer
         viewModel.isDeleted.observe(this) {
             if(it == true) {
+                lifecycleScope.launch { viewModel.fetchCommands() }
                 Toast.makeText(this, R.string.confirm_deleted, Toast.LENGTH_SHORT).show()
             }
         }

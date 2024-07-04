@@ -42,7 +42,7 @@ class OpenAppFragment: ActionFragment() {
 
     override fun getParameters(): Map<String, String> {
         val params: HashMap<String, String> = HashMap()
-        val selectedApp = viewModel.selectedApp.value
+        val selectedApp = viewModel.selectedApp.get()
         selectedApp?.let {
             params[ParameterKeys.APP_NAME.toString()] = it.name
             params[ParameterKeys.APP_PACKAGE.toString()] = it.pkg

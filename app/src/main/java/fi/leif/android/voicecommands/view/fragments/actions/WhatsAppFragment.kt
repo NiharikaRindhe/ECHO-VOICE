@@ -5,6 +5,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class WhatsAppFragment: RtcFragment() {
     override suspend fun fetchValues() {
+        super.fetchValues()
         viewModel.fetchWhatsAppContacts()
     }
 }

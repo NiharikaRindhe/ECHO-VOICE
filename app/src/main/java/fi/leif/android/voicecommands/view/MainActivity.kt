@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), SpeechToTextListener {
             delay(EXECUTE_DELAY_MS)
             stop()
             commandLauncher.executeCommand(this@MainActivity, commandWord, text)
-            // quit()
+            quit()
         }
     }
 

@@ -28,8 +28,12 @@ class RtcTypeMapper {
             return context?.getString(resourceId) ?: ""
         }
 
-        fun getRtcType(context: Context?, rtcTypeName: String?): RtcType {
-            return rtcTypeName?.let { getRtcType(context, it) } ?: UNRECOGNIZED
+        fun getRtcTypeByName(context: Context?, rtcTypeName: String?): RtcType {
+            return when(rtcTypeName) {
+                context?.getString(R.string.rtc_type_message) -> return MESSAGE
+                context?.getString(R.string.rtc_type_audio) -> return AUDIO_CALL
+                else -> UNRECOGNIZED
+            }
         }
 
         fun getAllRtcTypeNames(context: Context?): List<String> {
