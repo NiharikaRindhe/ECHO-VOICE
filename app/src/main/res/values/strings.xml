@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Voice Commands</string>
+    <string name="app_name">ECHO</string>
 
     <!-- Texts -->
     <string name="settings">Settings</string>
