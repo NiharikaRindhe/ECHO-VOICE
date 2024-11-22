@@ -1,6 +1,7 @@
 package fi.leif.android.voicecommands.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -36,18 +37,33 @@ class SettingsViewModel @Inject constructor(
     val supportedLanguages: LiveData<List<String>> = _supportedLanguages
 
     val selectedExtraLanguage = ObservableField<String>()
+
     fun setSelectedExtraLanguage(position: Int) {
         val langCode = languageRepository.getLanguageCodeByIndex(position)
         viewModelScope.launch {
             settingsRepository.setExtraLanguage(langCode)
+            Log.d("SettingsViewModel", "Language updated to: $langCode")
         }
     }
 
     private suspend fun initLanguages(extraLanguage: String) {
         languageRepository.getSupportedLanguages().asFlow().collect { langs ->
+            if (langs.isNullOrEmpty()) {
+                Log.e("SettingsViewModel", "Language list is empty, applying fallback.")
+                _supportedLanguages.value = listOf("English (United States)", "Hindi (India)")
+                selectedExtraLanguage.set("English (United States)") // Default selection
+                return@collect
+            }
+
             _supportedLanguages.value = langs
             val index = languageRepository.getIndexByLanguageCode(extraLanguage)
-            langs[index].also { selectedExtraLanguage.set(it) }
+
+            if (index in langs.indices) {
+                selectedExtraLanguage.set(langs[index])
+            } else {
+                Log.e("SettingsViewModel", "Invalid language index: $index. Using default.")
+                selectedExtraLanguage.set(langs[0]) // Default to the first language
+            }
         }
     }
 
@@ -58,17 +74,17 @@ class SettingsViewModel @Inject constructor(
 
     val maxRmsDb = ObservableField<String>()
     fun setMaxRmsDb(text: ObservableField<String>) {
-            val number = text.get()?.toFloatOrNull()
-            if (number != null && number in 1f..100f) {
-                viewModelScope.launch {
-                    settingsRepository.setMaxRms(number)
-                }
-            } else {
-                _validationError.value = ValidationError.INVALID_RMS_DB
+        val number = text.get()?.toFloatOrNull()
+        if (number != null && number in 1f..100f) {
+            viewModelScope.launch {
+                settingsRepository.setMaxRms(number)
+                Log.d("SettingsViewModel", "Max RMS updated to: $number")
             }
+        } else {
+            _validationError.value = ValidationError.INVALID_RMS_DB
+        }
     }
 
     private var _recMaxRmsDb: MutableLiveData<String> = MutableLiveData()
     val recMaxRmsDb: LiveData<String> = _recMaxRmsDb
-
 }
