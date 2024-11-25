@@ -10,13 +10,14 @@ import fi.leif.voicecommands.Command
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CommandLauncher(val context: Context) {
+class CommandLauncher @Inject constructor(
+    private val context: Context,
+    private val settingsRepository: SettingsRepository
+) {
 
-    // TODO: Dependency Inject
-    private val settingsRepository = SettingsRepository(context)
-
-    private var wordsMap = linkedMapOf<String, Command>()
+    private val wordsMap = linkedMapOf<String, Command>()
     private var defaultCommand: Command = Command.getDefaultInstance()
 
     init {
@@ -29,20 +30,24 @@ class CommandLauncher(val context: Context) {
     }
 
     private fun buildWordsActionsMap(commands: List<Command>) {
-        val unsortedMap = HashMap<String,Command>()
-        for(cmd in commands) for(word in cmd.wordsList) {
+        val unsortedMap = HashMap<String, Command>()
+        for (cmd in commands) for (word in cmd.wordsList) {
             unsortedMap[word] = cmd
         }
         // Create a Map of all command words sorted by longest word first
-        unsortedMap.entries.sortedByDescending { it.key.length }.forEach{ (word,command) ->
+        unsortedMap.entries.sortedByDescending { it.key.length }.forEach { (word, command) ->
             wordsMap[word] = command
         }
     }
 
     fun textContainsCommand(text: String): String? {
-        if(text.isEmpty()) return null
-        wordsMap.entries.forEach{ (word,_) ->
-            if(text.lowercase().contains(word.lowercase())) {
+        val lowerText = text.lowercase()
+        if (lowerText.startsWith("open ")) {
+            return "open"
+        }
+
+        wordsMap.entries.forEach { (word, _) ->
+            if (lowerText.contains(word.lowercase())) {
                 return word
             }
         }
@@ -52,16 +57,19 @@ class CommandLauncher(val context: Context) {
     suspend fun executeCommand(context: Context, cmdWord: String?, text: String) {
         val command = wordsMap[cmdWord]
         try {
-            if(command != null) {
+            if (command != null) {
+                // Execute the predefined command
                 ActionMapper.getActionExecutor(command.action)
                     .execute(context, text, command)
-            } else if(defaultCommand.action != Action.NONE) {
-                ActionMapper.getActionExecutor(defaultCommand.action)
-                    .execute(context, text, defaultCommand)
+            } else {
+                // Fall back to dynamic app opening if no predefined command matches
+                val openAppExecutor = OpenAppExecutor()
+                openAppExecutor.execute(context, text, defaultCommand)
             }
-        }
-        catch (e: ActivityNotFoundException) {
-            Log.e("executeCommand", e.toString(), e)
+        } catch (e: ActivityNotFoundException) {
+            Log.e("CommandLauncher", "Activity not found for the command: $text", e)
         }
     }
 }
+
+
