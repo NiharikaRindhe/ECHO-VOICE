@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fi.leif.android.voicecommands.mappers.ActionMapper
 import fi.leif.android.voicecommands.repositories.settings.SettingsRepository
 import fi.leif.voicecommands.Action
-import fi.leif.voicecommands.Action.GOOGLE_MAPS
 import fi.leif.voicecommands.Command
 import fi.leif.voicecommands.Settings
 import kotlinx.coroutines.flow.first
@@ -33,10 +32,10 @@ class EditCommandViewModel @Inject constructor(
     private var _updateCommandIndex = 0
     fun setMode(editMode: EditMode, existingCommandIndex: Int?) {
         _mode = editMode
-        if(editMode == EditMode.DEFAULT_COMMAND) {
-            val command = settings?.defaultCommand
-            command?.action?.let { setSelectedAction(it) }
-        } else if(editMode == EditMode.UPDATE_COMMAND && existingCommandIndex != null) {
+        if (editMode == EditMode.DEFAULT_COMMAND) {
+            // Force "No Action" for DEFAULT_COMMAND
+            setSelectedAction(Action.NONE)
+        } else if (editMode == EditMode.UPDATE_COMMAND && existingCommandIndex != null) {
             _updateCommandIndex = existingCommandIndex
             val command = settings?.getCommands(existingCommandIndex)
             command?.wordsList?.let { _commandWords.value?.addAll(it) }
@@ -58,17 +57,24 @@ class EditCommandViewModel @Inject constructor(
 
     private var _actions = MutableLiveData<List<String>>()
     val actions: LiveData<List<String>> = _actions
-    fun setActions(actions: List<String>){
+    fun setActions(actions: List<String>) {
         _actions.value = actions
     }
-    private var _selectedAction = MutableLiveData(GOOGLE_MAPS)
+
+    private var _selectedAction = MutableLiveData<Action>(Action.NONE) // Default to "No Action"
     val selectedAction: LiveData<Action> = _selectedAction
     fun setSelectedAction(action: Action) {
-        _selectedAction.value = action
+        // Ensure DEFAULT_COMMAND is always "No Action"
+        if (_mode == EditMode.DEFAULT_COMMAND) {
+            _selectedAction.value = Action.NONE
+        } else {
+            _selectedAction.value = action
+        }
     }
+
     fun setSelectedActionByPosition(position: Int) {
         // Default command has an additional action
-        val pos = if(_mode == EditMode.DEFAULT_COMMAND) position else position+1
+        val pos = if (_mode == EditMode.DEFAULT_COMMAND) position else position + 1
         val action = ActionMapper.getActionAt(pos)
         setSelectedAction(action)
     }
@@ -78,7 +84,14 @@ class EditCommandViewModel @Inject constructor(
     fun save(params: Map<String, String>) {
         // Build Command
         val builder = Command.newBuilder()
-        builder.action = selectedAction.value
+
+        // Force DEFAULT_COMMAND to "No Action"
+        if (_mode == EditMode.DEFAULT_COMMAND) {
+            builder.action = Action.NONE
+        } else {
+            builder.action = selectedAction.value
+        }
+
         builder.addAllWords(commandWords.value)
         builder.putAllParameters(params)
         val command = builder.build()
@@ -86,7 +99,7 @@ class EditCommandViewModel @Inject constructor(
         // Save co-routine
         viewModelScope.launch {
             _isSaved.value = false
-            when(_mode) {
+            when (_mode) {
                 EditMode.DEFAULT_COMMAND -> settingsRepository.updateDefaultCommand(command)
                 EditMode.UPDATE_COMMAND -> settingsRepository.updateCommand(_updateCommandIndex, command)
                 else -> settingsRepository.addCommand(command)
@@ -98,7 +111,7 @@ class EditCommandViewModel @Inject constructor(
     private var _validationError = MutableLiveData<ValidationError>()
     val validationError: LiveData<ValidationError> = _validationError
     fun isValid(): Boolean {
-        if(_mode != EditMode.DEFAULT_COMMAND && commandWords.value?.size == 0) {
+        if (_mode != EditMode.DEFAULT_COMMAND && commandWords.value?.size == 0) {
             _validationError.value = ValidationError.NO_KEYWORDS
             return false
         }
@@ -106,15 +119,15 @@ class EditCommandViewModel @Inject constructor(
     }
 
     fun isValidKeyword(word: String): Boolean {
-        if(word.isEmpty()) {
+        if (word.isEmpty()) {
             _validationError.value = ValidationError.EMPTY_KEYWORD
             return false
         }
-        if(commandWords.value?.contains(word) == true) {
+        if (commandWords.value?.contains(word) == true) {
             _validationError.value = ValidationError.KEYWORD_EXISTS
             return false
         }
-        val exists: Command? = settings?.commandsList?.find{ it.wordsList.contains(word) }
+        val exists: Command? = settings?.commandsList?.find { it.wordsList.contains(word) }
         exists?.let {
             _validationError.value = ValidationError.KEYWORD_EXISTS
             return false
@@ -122,3 +135,4 @@ class EditCommandViewModel @Inject constructor(
         return true
     }
 }
+
