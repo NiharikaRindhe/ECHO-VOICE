@@ -24,6 +24,7 @@
     <string name="action_telegram">Telegram</string>
     <string name="action_whatsapp">WhatsApp</string>
     <string name="action_spotify">Spotify</string>
+    <string name="action_youtube">YouTube</string>
     <string name="action_netflix">Netflix</string>
     <string name="action_open_app">Open Application</string>
     <string name="action_none">No Action</string>
@@ -49,7 +50,7 @@
     <string name="error_no_keywords">You have specified no voice keyword(s)!</string>
     <string name="error_keyword_exists">Keyword already exists!</string>
     <string name="error_package_name_empty">Package Name cannot be empty!</string>
-    <string name="error_rms_db">Microphone max sensitivyt must be between 1 and 100</string>
+    <string name="error_rms_db">Microphone max sensitivity must be between 1 and 100</string>
     <string name="error_rtc_message_recipient_empty">For sending a Message you must select a Recipient!</string>
 
     <string name="confirm_saved">Command saved</string>
